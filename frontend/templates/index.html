@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Pollution & Traffic Optimizer</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link
+    rel="stylesheet"
+    href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css)"
+  />
+  <link
+    rel="stylesheet"
+    href="[unpkg.com](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css)"
+  />
+  <script src="[unpkg.com](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js)"></script>
+  <script src="[unpkg.com](https://unpkg.com/leaflet.heat/dist/leaflet-heat.js)"></script>
+</head>
+
+<body>
+  <header class="header">
+    <h1>🌬 AI Pollution & Traffic Optimizer</h1>
+    <div class="header-controls">
+      <select id="city-select">
+        <option value="pune" selected>Pune</option>
+        <option value="mumbai">Mumbai</option>
+        <option value="delhi">Delhi</option>
+        <option value="bangalore">Bangalore</option>
+      </select>
+      <button id="refresh-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <section class="left-panel">
+      <div id="aqi-card" class="card aqi-card">
+        <h3>Current Air Quality</h3>
+        <div class="aqi-display">
+          <span id="aqi-value" class="aqi-number">--</span>
+          <span id="aqi-category" class="aqi-category">Loading...</span>
+        </div>
+        <div id="weather-info" class="weather-info"></div>
+        <div id="pollutant-details" class="pollutant-details"></div>
+      </div>
+
+      <div id="predictions" class="card predictions-card">
+        <h3>Predictions (Next 4 Hours)</h3>
+      </div>
+
+      <div id="best-time" class="card best-time-card"></div>
+
+      <div id="alerts" class="card alerts-card">
+        <h3>Alerts</h3>
+      </div>
+    </section>
+
+    <section class="map-panel">
+      <div id="map"></div>
+      <div id="loader" class="loader"><div class="spinner"></div></div>
+    </section>
+
+    <section class="right-panel">
+      <div class="card route-card">
+        <h3>Route Optimization</h3>
+        <div class="route-form">
+          <input id="origin" placeholder="Origin (optional demo only)" />
+          <input id="destination" placeholder="Destination" />
+          <select id="route-preference">
+            <option value="balanced">Balanced</option>
+            <option value="cleanest">Cleanest</option>
+            <option value="fastest">Fastest</option>
+          </select>
+          <button id="optimize-btn"><i class="fas fa-route"></i> Optimize</button>
+        </div>
+        <div id="route-result" class="route-result"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="error-toast" class="toast"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

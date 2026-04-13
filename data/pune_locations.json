@@ -1,0 +1,77 @@
+{
+  "city": "Pune",
+  "center": {
+    "latitude": 18.5204,
+    "longitude": 73.8567
+  },
+  "zones": {
+    "Central": {
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "landmarks": ["Shivaji Nagar", "Deccan", "FC Road"]
+    },
+    "North": {
+      "latitude": 18.5700,
+      "longitude": 73.8200,
+      "landmarks": ["Aundh", "Baner", "Pashan"]
+    },
+    "South": {
+      "latitude": 18.4800,
+      "longitude": 73.8700,
+      "landmarks": ["Swargate", "Katraj", "Bibwewadi"]
+    },
+    "East": {
+      "latitude": 18.5300,
+      "longitude": 73.9200,
+      "landmarks": ["Koregaon Park", "Kalyani Nagar", "Viman Nagar"]
+    },
+    "West": {
+      "latitude": 18.5000,
+      "longitude": 73.7800,
+      "landmarks": ["Kothrud", "Karve Nagar", "Warje"]
+    }
+  },
+  "traffic_hotspots": [
+    {
+      "name": "Swargate",
+      "latitude": 18.5018,
+      "longitude": 73.8636,
+      "typical_congestion": "high"
+    },
+    {
+      "name": "Hinjewadi IT Park",
+      "latitude": 18.5912,
+      "longitude": 73.7388,
+      "typical_congestion": "severe"
+    },
+    {
+      "name": "Shivaji Nagar",
+      "latitude": 18.5314,
+      "longitude": 73.8446,
+      "typical_congestion": "high"
+    },
+    {
+      "name": "Hadapsar",
+      "latitude": 18.5089,
+      "longitude": 73.9260,
+      "typical_congestion": "moderate"
+    }
+  ],
+  "monitoring_stations": [
+    {
+      "name": "Shivaji Nagar AQI Station",
+      "latitude": 18.5314,
+      "longitude": 73.8446
+    },
+    {
+      "name": "Lohegaon AQI Station",
+      "latitude": 18.5793,
+      "longitude": 73.9089
+    },
+    {
+      "name": "Karve Road AQI Station",
+      "latitude": 18.5012,
+      "longitude": 73.8170
+    }
+  ]
+}
