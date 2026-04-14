@@ -1,84 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Pollution & Traffic Optimizer</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
-  <link
-    rel="stylesheet"
-    href="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css)"
-  />
-  <link
-    rel="stylesheet"
-    href="[unpkg.com](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css)"
-  />
-  <script src="[unpkg.com](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js)"></script>
-  <script src="[unpkg.com](https://unpkg.com/leaflet.heat/dist/leaflet-heat.js)"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pollution & Traffic Optimizer</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-
 <body>
-  <header class="header">
-    <h1>🌬 AI Pollution & Traffic Optimizer</h1>
-    <div class="header-controls">
-      <select id="city-select">
-        <option value="pune" selected>Pune</option>
-        <option value="mumbai">Mumbai</option>
-        <option value="delhi">Delhi</option>
-        <option value="bangalore">Bangalore</option>
-      </select>
-      <button id="refresh-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                <i class="fas fa-leaf"></i> 
+                AI Pollution & Traffic Optimizer
+            </h1>
+            <div class="header-controls">
+                <select id="city-select" class="city-select">
+                    <option value="pune">Pune</option>
+                    <option value="mumbai">Mumbai</option>
+                    <option value="delhi">Delhi</option>
+                    <option value="bangalore">Bangalore</option>
+                    <option value="chennai">Chennai</option>
+                    <option value="hyderabad">Hyderabad</option>
+                    <option value="kolkata">Kolkata</option>
+                </select>
+                <button id="refresh-btn" class="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+            <!-- Current AQI Card -->
+            <div class="card" id="aqi-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-wind"></i> Current Air Quality</h2>
+                </div>
+                <div class="aqi-display">
+                    <div class="aqi-number" id="aqi-value">--</div>
+                    <div class="aqi-category" id="aqi-category">Loading...</div>
+                </div>
+                <div class="pollutant-details" id="pollutant-details">
+                    <div class="pollutant-item">
+                        <span class="pollutant-label">PM2.5</span>
+                        <span class="pollutant-value">--</span>
+                    </div>
+                    <div class="pollutant-item">
+                        <span class="pollutant-label">PM10</span>
+                        <span class="pollutant-value">--</span>
+                    </div>
+                </div>
+                <div class="weather-info" id="weather-info">
+                    <div class="weather-item">
+                        <i class="fas fa-thermometer-half"></i>
+                        <span>--°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predictions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-line"></i> Predictions (Next 4 Hours)</h2>
+                </div>
+                <div id="predictions" class="predictions-container">
+                    <div class="prediction-row">
+                        <div class="prediction-item">
+                            <span class="prediction-label">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Card -->
+            <div class="card alerts-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bell"></i> Alerts</h2>
+                </div>
+                <div id="alerts" class="alerts-container">
+                    <p>Loading alerts...</p>
+                </div>
+            </div>
+
+            <!-- Map Card -->
+            <div class="card map-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-map"></i> Pollution & Traffic Heatmap</h2>
+                </div>
+                <div id="map" class="map-container"></div>
+            </div>
+
+            <!-- Best Travel Time Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-clock"></i> Best Time to Travel</h2>
+                </div>
+                <div id="best-time" class="best-time-container">
+                    <p>Loading recommendations...</p>
+                </div>
+            </div>
+
+            <!-- Route Optimization Card -->
+            <div class="card route-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-route"></i> Route Optimization</h2>
+                </div>
+                <div class="route-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Origin</label>
+                        <input type="text" id="origin" placeholder="Enter origin (demo only)">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-flag-checkered"></i> Destination</label>
+                        <input type="text" id="destination" placeholder="Enter destination">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sliders-h"></i> Preference</label>
+                        <select id="route-preference">
+                            <option value="balanced">Balanced</option>
+                            <option value="fastest">Fastest</option>
+                            <option value="cleanest">Cleanest (Low Pollution)</option>
+                        </select>
+                    </div>
+                    <button id="optimize-btn" class="optimize-btn">
+                        <i class="fas fa-search"></i> Optimize Route
+                    </button>
+                </div>
+                <div id="route-result" class="route-result"></div>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <main class="dashboard">
-    <section class="left-panel">
-      <div id="aqi-card" class="card aqi-card">
-        <h3>Current Air Quality</h3>
-        <div class="aqi-display">
-          <span id="aqi-value" class="aqi-number">--</span>
-          <span id="aqi-category" class="aqi-category">Loading...</span>
-        </div>
-        <div id="weather-info" class="weather-info"></div>
-        <div id="pollutant-details" class="pollutant-details"></div>
-      </div>
+    <!-- Loader -->
+    <div id="loader" class="loader" style="display: none;">
+        <div class="spinner"></div>
+    </div>
 
-      <div id="predictions" class="card predictions-card">
-        <h3>Predictions (Next 4 Hours)</h3>
-      </div>
+    <!-- Error Toast -->
+    <div id="error-toast" class="error-toast"></div>
 
-      <div id="best-time" class="card best-time-card"></div>
-
-      <div id="alerts" class="card alerts-card">
-        <h3>Alerts</h3>
-      </div>
-    </section>
-
-    <section class="map-panel">
-      <div id="map"></div>
-      <div id="loader" class="loader"><div class="spinner"></div></div>
-    </section>
-
-    <section class="right-panel">
-      <div class="card route-card">
-        <h3>Route Optimization</h3>
-        <div class="route-form">
-          <input id="origin" placeholder="Origin (optional demo only)" />
-          <input id="destination" placeholder="Destination" />
-          <select id="route-preference">
-            <option value="balanced">Balanced</option>
-            <option value="cleanest">Cleanest</option>
-            <option value="fastest">Fastest</option>
-          </select>
-          <button id="optimize-btn"><i class="fas fa-route"></i> Optimize</button>
-        </div>
-        <div id="route-result" class="route-result"></div>
-      </div>
-    </section>
-  </main>
-
-  <div id="error-toast" class="toast"></div>
-
-  <script src="/static/js/app.js"></script>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <script src="/static/js/app.js"></script>
 </body>
 </html>

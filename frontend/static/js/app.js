@@ -1,7 +1,6 @@
 /**
  * Pollution & Traffic Optimizer - Frontend Application
  */
-
 // Configuration
 const API_BASE = '';
 const DEFAULT_CITY = 'pune';
@@ -15,6 +14,7 @@ let currentCity = DEFAULT_CITY;
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('App initializing...');
     initMap();
     loadDashboard();
     setupEventListeners();
@@ -31,15 +31,11 @@ function initMap() {
     map = L.map('map').setView(defaultCenter, 12);
     
     // Add tile layer
-    L.tileLayer('[{s}.tile.openstreetmap.org](https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png)', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
     
-    // Add click handler for getting AQI at location
-    map.on('click', async (e) => {
-        const { lat, lng } = e.latlng;
-        await showLocationAQI(lat, lng);
-    });
+    console.log('Map initialized');
 }
 
 /**
@@ -70,12 +66,14 @@ async function loadDashboard() {
 async function loadCurrentAQI() {
     try {
         const response = await fetch(`${API_BASE}/api/aqi/${currentCity}`);
+        if (!response.ok) throw new Error('AQI fetch failed');
         const data = await response.json();
         
         updateAQIDisplay(data);
         updateAQIMap(data);
     } catch (error) {
         console.error('Error loading AQI:', error);
+        document.getElementById('aqi-value').textContent = 'Error';
     }
 }
 
@@ -83,7 +81,6 @@ async function loadCurrentAQI() {
  * Update AQI display elements
  */
 function updateAQIDisplay(data) {
-    // Update main AQI value
     const aqiValue = document.getElementById('aqi-value');
     const aqiCategory = document.getElementById('aqi-category');
     const aqiCard = document.getElementById('aqi-card');
@@ -101,10 +98,7 @@ function updateAQIDisplay(data) {
         aqiCard.className = `card aqi-card ${getAQIClass(data.aqi)}`;
     }
     
-    // Update pollutant details
     updatePollutantDetails(data);
-    
-    // Update weather info
     updateWeatherInfo(data);
 }
 
@@ -164,11 +158,13 @@ function updateWeatherInfo(data) {
 async function loadPredictions() {
     try {
         const response = await fetch(`${API_BASE}/api/predictions/${currentCity}`);
+        if (!response.ok) throw new Error('Predictions fetch failed');
         const data = await response.json();
         
         updatePredictionDisplay(data);
     } catch (error) {
         console.error('Error loading predictions:', error);
+        document.getElementById('predictions').innerHTML = '<p>Failed to load predictions</p>';
     }
 }
 
@@ -219,6 +215,7 @@ function updatePredictionDisplay(data) {
 async function loadAlerts() {
     try {
         const response = await fetch(`${API_BASE}/api/predictions/${currentCity}/alerts`);
+        if (!response.ok) throw new Error('Alerts fetch failed');
         const alerts = await response.json();
         
         updateAlertsDisplay(alerts);
@@ -259,6 +256,7 @@ function updateAlertsDisplay(alerts) {
 async function loadTrafficHeatmap() {
     try {
         const response = await fetch(`${API_BASE}/api/traffic/${currentCity}/heatmap`);
+        if (!response.ok) throw new Error('Heatmap fetch failed');
         const data = await response.json();
         
         updateHeatmap(data);
@@ -271,15 +269,14 @@ async function loadTrafficHeatmap() {
  * Update heatmap layer
  */
 function updateHeatmap(data) {
-    // Remove existing heatmap
-    if (heatmapLayer) {
+    if (heatmapLayer && map) {
         map.removeLayer(heatmapLayer);
     }
     
-    // Create heatmap data
+    if (!map) return;
+    
     const heatData = data.points.map(p => [p.lat, p.lng, p.intensity]);
     
-    // Add new heatmap layer (if leaflet.heat is available)
     if (typeof L.heatLayer === 'function') {
         heatmapLayer = L.heatLayer(heatData, {
             radius: 25,
@@ -293,11 +290,6 @@ function updateHeatmap(data) {
             }
         }).addTo(map);
     }
-    
-    // Update center
-    if (data.center) {
-        map.setView([data.center.lat, data.center.lng], 12);
-    }
 }
 
 /**
@@ -306,6 +298,7 @@ function updateHeatmap(data) {
 async function loadBestTravelTime() {
     try {
         const response = await fetch(`${API_BASE}/api/predictions/${currentCity}/best-time`);
+        if (!response.ok) throw new Error('Best time fetch failed');
         const data = await response.json();
         
         updateBestTimeDisplay(data);
@@ -322,9 +315,6 @@ function updateBestTimeDisplay(data) {
     if (!container) return;
     
     container.innerHTML = `
-        <div class="best-time-header">
-            <h4>Best Time to Travel</h4>
-        </div>
         <div class="recommendations">
             ${data.recommendations.map(rec => `
                 <div class="recommendation-item">
@@ -338,42 +328,14 @@ function updateBestTimeDisplay(data) {
 }
 
 /**
- * Show AQI at clicked location
- */
-async function showLocationAQI(lat, lng) {
-    try {
-        const response = await fetch(`${API_BASE}/api/aqi/location/coordinates?lat=${lat}&lon=${lng}`);
-        const data = await response.json();
-        
-        // Remove existing markers
-        markers.forEach(m => map.removeLayer(m));
-        markers = [];
-        
-        // Add new marker
-        const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`
-            <div class="popup-content">
-                <h4>Air Quality</h4>
-                <p class="popup-aqi ${getAQIClass(data.aqi)}">AQI: ${data.aqi}</p>
-                <p class="popup-category">${data.category}</p>
-            </div>
-        `).openPopup();
-        
-        markers.push(marker);
-    } catch (error) {
-        console.error('Error getting location AQI:', error);
-    }
-}
-
-/**
  * Update AQI markers on map
  */
 function updateAQIMap(data) {
-    // Clear existing markers
+    if (!map) return;
+    
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     
-    // Add city center marker
     const coords = getCityCoordinates(currentCity);
     if (coords) {
         const marker = L.circleMarker(coords, {
@@ -413,15 +375,12 @@ async function optimizeRoute() {
     showLoading(true);
     
     try {
-        // For demo, use city center coordinates
         const origin = getCityCoordinates(currentCity);
-        const dest = [origin[0] + 0.05, origin[1] + 0.05]; // Offset for demo
+        const dest = [origin[0] + 0.05, origin[1] + 0.05];
         
         const response = await fetch(`${API_BASE}/api/routes/optimize`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 origin: { latitude: origin[0], longitude: origin[1] },
                 destination: { latitude: dest[0], longitude: dest[1] },
@@ -429,6 +388,7 @@ async function optimizeRoute() {
             })
         });
         
+        if (!response.ok) throw new Error('Route optimization failed');
         const data = await response.json();
         displayRouteResult(data);
     } catch (error) {
@@ -475,57 +435,12 @@ function displayRouteResult(data) {
             ` : ''}
         </div>
     `;
-    
-    // Draw route on map
-    drawRouteOnMap(route);
-}
-
-/**
- * Draw route on map
- */
-function drawRouteOnMap(route) {
-    // Remove existing route layers
-    map.eachLayer(layer => {
-        if (layer instanceof L.Polyline && !(layer instanceof L.Circle)) {
-            map.removeLayer(layer);
-        }
-    });
-    
-    // Create polyline from waypoints
-    const latlngs = route.waypoints.map(wp => [wp.coordinates.latitude, wp.coordinates.longitude]);
-    
-    const routeLine = L.polyline(latlngs, {
-        color: '#3388ff',
-        weight: 4,
-        opacity: 0.8
-    }).addTo(map);
-    
-    // Fit map to route
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-    
-    // Add waypoint markers
-    route.waypoints.forEach((wp, index) => {
-        const color = getAQIColor(wp.aqi);
-        L.circleMarker([wp.coordinates.latitude, wp.coordinates.longitude], {
-            radius: 8,
-            fillColor: color,
-            color: '#fff',
-            weight: 2,
-            fillOpacity: 0.8
-        }).addTo(map).bindPopup(`
-            <div class="popup-content">
-                <p>Waypoint ${index + 1}</p>
-                <p class="${getAQIClass(wp.aqi)}">AQI: ${wp.aqi}</p>
-            </div>
-        `);
-    });
 }
 
 /**
  * Setup event listeners
  */
 function setupEventListeners() {
-    // City selector
     const citySelect = document.getElementById('city-select');
     if (citySelect) {
         citySelect.addEventListener('change', (e) => {
@@ -534,13 +449,11 @@ function setupEventListeners() {
         });
     }
     
-    // Refresh button
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', loadDashboard);
     }
     
-    // Route optimize button
     const optimizeBtn = document.getElementById('optimize-btn');
     if (optimizeBtn) {
         optimizeBtn.addEventListener('click', optimizeRoute);
@@ -558,7 +471,6 @@ function startAutoRefresh() {
 }
 
 // Utility functions
-
 function getAQIClass(aqi) {
     if (aqi <= 50) return 'aqi-good';
     if (aqi <= 100) return 'aqi-moderate';
@@ -599,7 +511,10 @@ function getCityCoordinates(city) {
         'pune': [18.5204, 73.8567],
         'mumbai': [19.0760, 72.8777],
         'delhi': [28.6139, 77.2090],
-        'bangalore': [12.9716, 77.5946]
+        'bangalore': [12.9716, 77.5946],
+        'chennai': [13.0827, 80.2707],
+        'hyderabad': [17.3850, 78.4867],
+        'kolkata': [22.5726, 88.3639]
     };
     return coords[city.toLowerCase()] || coords['pune'];
 }
@@ -617,7 +532,5 @@ function showError(message) {
         toast.textContent = message;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
-    } else {
-        alert(message);
     }
 }
