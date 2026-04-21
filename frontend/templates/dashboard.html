@@ -7,203 +7,109 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --blue:#1a7ec8;--bg:#f0eeea;--sidebar:#ffffff;--card:#ffffff;--text:#1a1a1a;--muted:#888;--border:#e8e5e0;--orange:#f07020;--green:#22a06b;--red:#e05252; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh; }
 
-    :root {
-      --blue: #1a7ec8;
-      --bg: #f0eeea;
-      --sidebar: #ffffff;
-      --card: #ffffff;
-      --text: #1a1a1a;
-      --muted: #888;
-      --border: #e8e5e0;
-      --orange: #f07020;
-      --green: #22a06b;
-      --red: #e05252;
-    }
+    /* SIDEBAR */
+    .sidebar { width:240px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 0;position:fixed;top:0;left:0;bottom:0; }
+    .sidebar-brand { padding:0 20px 28px;border-bottom:1px solid var(--border); }
+    .brand-row { display:flex;align-items:center;gap:10px; }
+    .brand-icon { width:36px;height:36px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;font-size:16px; }
+    .brand-name { font-size:16px;font-weight:800; }
+    .brand-sub { font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-top:2px; }
+    .sidebar-nav { flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px; }
+    .nav-item { display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:500;color:#555;cursor:pointer;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left; }
+    .nav-item:hover { background:#f5f3ef;color:var(--text); }
+    .nav-item.active { background:#e8f3fc;color:var(--blue);font-weight:700; }
+    .nav-icon { font-size:17px;width:22px;text-align:center; }
+    .sidebar-footer { padding:16px 20px;border-top:1px solid var(--border); }
+    .user-row { display:flex;align-items:center;gap:12px;margin-bottom:12px; }
+    .user-avatar { width:36px;height:36px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;flex-shrink:0; }
+    .user-name { font-size:14px;font-weight:700; }
+    .user-city { font-size:12px;color:var(--muted); }
+    .logout-btn { display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border-radius:8px;border:none;background:#f5f3ef;color:#555;font-size:13px;font-weight:500;cursor:pointer; }
+    .logout-btn:hover { background:#ebe8e3; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      min-height: 100vh;
-    }
+    /* MAIN */
+    .main { margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh; }
+    .topbar { display:flex;align-items:center;justify-content:space-between;padding:18px 32px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10; }
+    .topbar-left { font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted); }
+    .voice-btn { display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:30px;border:1.5px solid var(--border);background:white;font-size:13px;font-weight:600;cursor:pointer; }
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: 240px;
-      min-height: 100vh;
-      background: var(--sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 24px 0;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-    }
-    .sidebar-brand {
-      padding: 0 20px 28px;
-      border-bottom: 1px solid var(--border);
-    }
-    .brand-row { display: flex; align-items: center; gap: 10px; }
-    .brand-icon {
-      width: 36px; height: 36px;
-      background: var(--blue); border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 16px;
-    }
-    .brand-name { font-size: 16px; font-weight: 800; }
-    .brand-sub { font-size: 10px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+    /* PAGES */
+    .page { display:none; }
+    .page.active { display:block; }
+    #page-dashboard { display:none; }
+    #page-dashboard.active { display:grid;grid-template-columns:1fr 320px;gap:20px;padding:28px 32px; }
 
-    .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 14px;
-      border-radius: 10px;
-      font-size: 14px; font-weight: 500;
-      color: #555;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-    .nav-item:hover { background: #f5f3ef; color: var(--text); }
-    .nav-item.active { background: #e8f3fc; color: var(--blue); font-weight: 700; }
-    .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+    /* CARDS */
+    .card { background:var(--card);border-radius:18px;padding:26px; }
+    .card-label { font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px; }
+    .aqi-card-main { position:relative; }
+    .morning-btn { position:absolute;top:0;right:0;display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:30px;border:1.5px solid var(--border);background:white;font-size:13px;font-weight:600;cursor:pointer; }
+    .aqi-big { font-size:80px;font-weight:800;color:var(--orange);line-height:1;margin-bottom:4px; }
+    .aqi-status { font-size:18px;font-weight:600;color:var(--orange);margin-bottom:6px; }
+    .aqi-sub { font-size:13px;color:var(--muted);margin-bottom:20px; }
+    .metric-row { display:grid;grid-template-columns:repeat(4,1fr);gap:12px; }
+    .metric-box { background:#f8f7f4;border-radius:12px;padding:14px 16px; }
+    .metric-lbl { font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px; }
+    .metric-val { font-size:18px;font-weight:800; }
+    .metric-unit { font-size:11px;color:var(--muted); }
+    .trend-card { margin-top:20px; }
+    .trend-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px; }
+    .trend-title { font-size:20px;font-weight:800; }
+    .trend-delta { font-size:14px;font-weight:700; }
+    .chart-wrap { height:200px;margin-top:16px; }
+    .right-col { display:flex;flex-direction:column;gap:20px; }
+    .exposure-inner { display:flex;align-items:center;gap:20px;margin-top:8px; }
+    .donut-wrap { position:relative;width:90px;height:90px;flex-shrink:0; }
+    .donut-label { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--muted); }
+    .exposure-val { font-size:32px;font-weight:800; }
+    .exposure-unit { font-size:12px;color:var(--muted); }
+    .exposure-limit { font-size:13px;color:var(--muted);margin-top:4px; }
+    .exposure-link { font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;margin-top:10px;display:block; }
+    .carbon-big { font-size:42px;font-weight:800;color:var(--green);line-height:1; }
+    .carbon-period { font-size:13px;color:var(--muted); }
+    .carbon-rows { margin-top:16px;display:flex;flex-direction:column;gap:10px; }
+    .carbon-row { display:flex;justify-content:space-between;font-size:14px; }
+    .carbon-row-lbl { color:#555; }
+    .carbon-row-val { font-weight:700; }
+    .carbon-link { font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;margin-top:14px;display:block; }
 
-    .sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-    }
-    .user-row {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
-    }
-    .user-avatar {
-      width: 36px; height: 36px;
-      background: var(--blue); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 14px; font-weight: 700;
-      flex-shrink: 0;
-    }
-    .user-name { font-size: 14px; font-weight: 700; }
-    .user-city { font-size: 12px; color: var(--muted); }
-    .logout-btn {
-      display: flex; align-items: center; gap: 8px;
-      width: 100%; padding: 9px 12px;
-      border-radius: 8px; border: none;
-      background: #f5f3ef; color: #555;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: background .15s;
-    }
-    .logout-btn:hover { background: #ebe8e3; }
+    /* PROFILE PAGE */
+    #page-profile.active { display:block;padding:36px 40px; }
+    .profile-wrap { max-width:660px; }
+    .profile-title { font-size:36px;font-weight:800;margin-bottom:6px; }
+    .profile-sub { font-size:14px;color:var(--muted);margin-bottom:28px; }
+    .profile-card { background:white;border-radius:18px;padding:32px; }
+    .pfield { margin-bottom:20px; }
+    .pfield label { display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:8px; }
+    .pfield input { width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:#fafaf9;outline:none;transition:border-color .2s; }
+    .pfield input:focus { border-color:var(--blue);background:white; }
+    .section-label { font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;margin-top:4px; }
+    .chip-group { display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px; }
+    .chip { padding:10px 18px;border-radius:10px;border:1.5px solid var(--border);background:#fafaf9;font-size:14px;font-weight:500;cursor:pointer;transition:all .18s;user-select:none; }
+    .chip:hover { border-color:var(--blue); }
+    .chip.selected { border-color:var(--blue);background:#e8f3fc;color:var(--blue);font-weight:700; }
+    .health-group { display:flex;gap:12px;margin-bottom:28px; }
+    .health-card { flex:1;padding:18px 14px;border-radius:14px;border:1.5px solid var(--border);background:#fafaf9;cursor:pointer;text-align:left;transition:all .18s; }
+    .health-card:hover { border-color:var(--blue); }
+    .health-card.selected { border-color:var(--blue);background:#e8f3fc; }
+    .health-card .emoji { font-size:24px;margin-bottom:8px;display:block; }
+    .health-card .hc-name { font-weight:700;font-size:14px; }
+    .health-card .hc-desc { font-size:12px;color:var(--muted);margin-top:3px; }
+    .save-btn { padding:14px 36px;border-radius:40px;border:none;background:var(--blue);color:white;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .18s; }
+    .save-btn:hover { opacity:.88; }
+    .save-btn:disabled { opacity:.5;cursor:not-allowed; }
+    .pmsg { font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none; }
+    .pmsg.success { background:#eafaf1;color:#1e8449;display:block; }
+    .pmsg.error { background:#fdecea;color:#c0392b;display:block; }
 
-    /* ── MAIN ── */
-    .main {
-      margin-left: 240px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    /* PLACEHOLDER */
+    .coming-soon { padding:60px 40px;font-size:24px;font-weight:800;color:var(--muted); }
 
-    /* ── TOP BAR ── */
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 32px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 10;
-    }
-    .topbar-left { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-    .voice-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px 18px; border-radius: 30px;
-      border: 1.5px solid var(--border); background: white;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: border-color .15s;
-    }
-    .voice-btn:hover { border-color: var(--blue); }
-
-    /* ── CONTENT ── */
-    .content {
-      padding: 28px 32px;
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 20px;
-    }
-
-    /* ── CARDS ── */
-    .card {
-      background: var(--card);
-      border-radius: 18px;
-      padding: 26px;
-    }
-    .card-label {
-      font-size: 11px; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
-    }
-
-    /* AQI card */
-    .aqi-card-main { position: relative; }
-    .morning-btn {
-      position: absolute; top: 0; right: 0;
-      display: flex; align-items: center; gap: 6px;
-      padding: 8px 16px; border-radius: 30px;
-      border: 1.5px solid var(--border); background: white;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-    }
-    .aqi-big { font-size: 80px; font-weight: 800; color: var(--orange); line-height: 1; margin-bottom: 4px; }
-    .aqi-status { font-size: 18px; font-weight: 600; color: var(--orange); margin-bottom: 6px; }
-    .aqi-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-    .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .metric-box {
-      background: #f8f7f4; border-radius: 12px;
-      padding: 14px 16px;
-    }
-    .metric-lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-    .metric-val { font-size: 18px; font-weight: 800; }
-    .metric-unit { font-size: 11px; color: var(--muted); }
-
-    /* Trend chart card */
-    .trend-card { margin-top: 20px; }
-    .trend-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-    .trend-title { font-size: 20px; font-weight: 800; }
-    .trend-delta { font-size: 14px; font-weight: 700; color: var(--red); }
-    .chart-wrap { height: 200px; margin-top: 16px; }
-
-    /* Right column */
-    .right-col { display: flex; flex-direction: column; gap: 20px; }
-
-    /* Exposure donut */
-    .exposure-inner {
-      display: flex; align-items: center; gap: 20px; margin-top: 8px;
-    }
-    .donut-wrap { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
-    .donut-label {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: var(--muted);
-    }
-    .exposure-val { font-size: 32px; font-weight: 800; }
-    .exposure-unit { font-size: 12px; color: var(--muted); }
-    .exposure-limit { font-size: 13px; color: var(--muted); margin-top: 4px; }
-    .exposure-link { font-size: 13px; font-weight: 700; color: var(--blue); text-decoration: none; margin-top: 10px; display: block; }
-
-    /* Carbon */
-    .carbon-big { font-size: 42px; font-weight: 800; color: var(--green); line-height: 1; }
-    .carbon-period { font-size: 13px; color: var(--muted); }
-    .carbon-rows { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .carbon-row { display: flex; justify-content: space-between; font-size: 14px; }
-    .carbon-row-lbl { color: #555; }
-    .carbon-row-val { font-weight: 700; }
-    .carbon-link { font-size: 13px; font-weight: 700; color: var(--blue); text-decoration: none; margin-top: 14px; display: block; }
-
-    /* Loading overlay */
-    #loading {
-      position: fixed; inset: 0;
-      background: rgba(240,238,234,.85);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100; font-size: 16px; font-weight: 600; color: var(--muted);
-    }
+    /* LOADING */
+    #loading { position:fixed;inset:0;background:rgba(240,238,234,.9);display:flex;align-items:center;justify-content:center;z-index:100;font-size:16px;font-weight:600;color:var(--muted); }
   </style>
 </head>
 <body>
@@ -215,48 +121,24 @@
   <div class="sidebar-brand">
     <div class="brand-row">
       <div class="brand-icon">💨</div>
-      <div>
-        <div class="brand-name">AirAware</div>
-        <div class="brand-sub">Breathe Smart</div>
-      </div>
+      <div><div class="brand-name">AirAware</div><div class="brand-sub">Breathe Smart</div></div>
     </div>
   </div>
-
   <nav class="sidebar-nav">
-    <a class="nav-item active" href="/dashboard">
-      <span class="nav-icon">▦</span> Dashboard
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">🚗</span> Commute
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">📈</span> Exposure
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">🌿</span> Carbon
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">↗</span> Trends
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">🗺</span> Heatmap
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">👤</span> Profile
-    </a>
+    <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')"><span class="nav-icon">▦</span> Dashboard</button>
+    <button class="nav-item" id="nav-commute"  onclick="showPage('commute')"><span class="nav-icon">🚗</span> Commute</button>
+    <button class="nav-item" id="nav-exposure" onclick="showPage('exposure')"><span class="nav-icon">📈</span> Exposure</button>
+    <button class="nav-item" id="nav-carbon"   onclick="showPage('carbon')"><span class="nav-icon">🌿</span> Carbon</button>
+    <button class="nav-item" id="nav-trends"   onclick="showPage('trends')"><span class="nav-icon">↗</span> Trends</button>
+    <button class="nav-item" id="nav-heatmap"  onclick="showPage('heatmap')"><span class="nav-icon">🗺</span> Heatmap</button>
+    <button class="nav-item" id="nav-profile"  onclick="showPage('profile')"><span class="nav-icon">👤</span> Profile</button>
   </nav>
-
   <div class="sidebar-footer">
     <div class="user-row">
       <div class="user-avatar" id="userInitial">?</div>
-      <div>
-        <div class="user-name" id="userName">Loading…</div>
-        <div class="user-city" id="userCity">–</div>
-      </div>
+      <div><div class="user-name" id="userName">…</div><div class="user-city" id="userCity">–</div></div>
     </div>
-    <button class="logout-btn" onclick="logout()">
-      <span>⟵</span> Logout
-    </button>
+    <button class="logout-btn" onclick="logout()"><span>⟵</span> Logout</button>
   </div>
 </aside>
 
@@ -267,11 +149,9 @@
     <button class="voice-btn">🔊 Voice Alert</button>
   </div>
 
-  <div class="content">
-    <!-- LEFT COLUMN -->
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="active">
     <div class="left-col">
-
-      <!-- AQI NOW -->
       <div class="card aqi-card-main">
         <div class="card-label" id="aqiCardLabel">Right Now · –</div>
         <button class="morning-btn">✨ Morning briefing</button>
@@ -279,47 +159,22 @@
         <div class="aqi-status" id="aqiStatus">–</div>
         <div class="aqi-sub" id="aqiSub">AQI · PM2.5 –</div>
         <div class="metric-row">
-          <div class="metric-box">
-            <div class="metric-lbl">PM10</div>
-            <div class="metric-val" id="pm10">–</div>
-            <div class="metric-unit">µg/m³</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-lbl">⇄ NO₂</div>
-            <div class="metric-val" id="no2">–</div>
-            <div class="metric-unit">µg/m³</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-lbl">🌡 Temp</div>
-            <div class="metric-val" id="temp">–</div>
-            <div class="metric-unit">°C</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-lbl">💧 Humidity</div>
-            <div class="metric-val" id="humidity">–</div>
-            <div class="metric-unit">%</div>
-          </div>
+          <div class="metric-box"><div class="metric-lbl">PM10</div><div class="metric-val" id="pm10">–</div><div class="metric-unit">µg/m³</div></div>
+          <div class="metric-box"><div class="metric-lbl">NO₂</div><div class="metric-val" id="no2">–</div><div class="metric-unit">µg/m³</div></div>
+          <div class="metric-box"><div class="metric-lbl">🌡 Temp</div><div class="metric-val" id="temp">–</div><div class="metric-unit">°C</div></div>
+          <div class="metric-box"><div class="metric-lbl">💧 Humidity</div><div class="metric-val" id="humidity">–</div><div class="metric-unit">%</div></div>
         </div>
       </div>
-
-      <!-- 14-DAY TREND -->
       <div class="card trend-card">
         <div class="card-label">14-Day AQI Trend</div>
         <div class="trend-header">
           <div class="trend-title">Air quality, this fortnight</div>
           <div class="trend-delta" id="trendDelta">–</div>
         </div>
-        <div class="chart-wrap">
-          <canvas id="trendChart"></canvas>
-        </div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
       </div>
-
     </div>
-
-    <!-- RIGHT COLUMN -->
     <div class="right-col">
-
-      <!-- EXPOSURE -->
       <div class="card">
         <div class="card-label">Today's Exposure</div>
         <div class="exposure-inner">
@@ -335,200 +190,233 @@
         </div>
         <a class="exposure-link" href="#">Exposure tracker →</a>
       </div>
-
-      <!-- CARBON -->
       <div class="card">
         <div class="card-label">Carbon Saved</div>
         <div class="carbon-big" id="carbonTotal">–</div>
         <div class="carbon-period">kg CO₂ · 30d</div>
         <div class="carbon-rows">
-          <div class="carbon-row">
-            <span class="carbon-row-lbl">Today</span>
-            <span class="carbon-row-val" id="carbonToday">–</span>
-          </div>
-          <div class="carbon-row">
-            <span class="carbon-row-lbl">This week</span>
-            <span class="carbon-row-val" id="carbonWeek">–</span>
-          </div>
-          <div class="carbon-row">
-            <span class="carbon-row-lbl">Trees equivalent</span>
-            <span class="carbon-row-val" id="carbonTrees">–</span>
-          </div>
+          <div class="carbon-row"><span class="carbon-row-lbl">Today</span><span class="carbon-row-val" id="carbonToday">–</span></div>
+          <div class="carbon-row"><span class="carbon-row-lbl">This week</span><span class="carbon-row-val" id="carbonWeek">–</span></div>
+          <div class="carbon-row"><span class="carbon-row-lbl">Trees equivalent</span><span class="carbon-row-val" id="carbonTrees">–</span></div>
         </div>
         <a class="carbon-link" href="#">Carbon dashboard →</a>
       </div>
-
     </div>
   </div>
+
+  <!-- PROFILE -->
+  <div id="page-profile" class="page">
+    <div class="profile-wrap">
+      <h1 class="profile-title">Personalize your air.</h1>
+      <p class="profile-sub">Update your city or health condition — we'll retune thresholds and routes instantly.</p>
+      <div class="profile-card">
+        <div id="profileMsg" class="pmsg"></div>
+        <div class="pfield"><label>Name</label><input id="pName" type="text" placeholder="Your full name" /></div>
+        <div class="pfield"><label>City</label><input id="pCity" type="text" placeholder="e.g. Mumbai" /></div>
+        <div class="section-label">Age Group</div>
+        <div class="chip-group" id="pAgeGroup">
+          <div class="chip" data-val="<18">&lt;18</div>
+          <div class="chip" data-val="18-30">18–30</div>
+          <div class="chip" data-val="30-45">30–45</div>
+          <div class="chip" data-val="45-60">45–60</div>
+          <div class="chip" data-val="60+">60+</div>
+        </div>
+        <div class="section-label">Health Condition</div>
+        <div class="health-group" id="pHealthCondition">
+          <div class="health-card" data-val="normal"><span class="emoji">🫁</span><div class="hc-name">Normal</div><div class="hc-desc">No respiratory conditions</div></div>
+          <div class="health-card" data-val="asthma"><span class="emoji">🌫️</span><div class="hc-name">Asthma</div><div class="hc-desc">Sensitive to PM2.5 / NO₂</div></div>
+          <div class="health-card" data-val="elderly"><span class="emoji">🧓</span><div class="hc-name">Elderly</div><div class="hc-desc">Lower activity tolerance</div></div>
+        </div>
+        <button class="save-btn" id="saveBtn" onclick="saveProfile()">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLACEHOLDERS -->
+  <div id="page-commute"  class="page"><div class="coming-soon">🚗 Commute — Coming soon</div></div>
+  <div id="page-exposure" class="page"><div class="coming-soon">📈 Exposure — Coming soon</div></div>
+  <div id="page-carbon"   class="page"><div class="coming-soon">🌿 Carbon — Coming soon</div></div>
+  <div id="page-trends"   class="page"><div class="coming-soon">↗ Trends — Coming soon</div></div>
+  <div id="page-heatmap"  class="page"><div class="coming-soon">🗺 Heatmap — Coming soon</div></div>
 </div>
 
 <script>
-// ── Auth guard ────────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('access_token');
 const userRaw = localStorage.getItem('user');
-if (!token || !userRaw) {
-  window.location.href = '/login';
+if (!token || !userRaw) { window.location.href = '/login'; }
+let user = JSON.parse(userRaw || '{}');
+
+function refreshSidebar() {
+  document.getElementById('userName').textContent = user.full_name || 'User';
+  document.getElementById('userCity').textContent = user.city || '–';
+  document.getElementById('userInitial').textContent = (user.full_name || 'U')[0].toUpperCase();
+  const h = user.health_condition || 'normal';
+  const hl = {normal:'Normal',asthma:'Asthma Mode',elderly:'Elderly Mode'}[h] || 'Normal';
+  document.getElementById('topbarLabel').textContent = `${(user.city||'City').toUpperCase()} · ${hl.toUpperCase()}`;
+}
+refreshSidebar();
+
+// ── Page switching ────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-dashboard').classList.remove('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (name === 'dashboard') {
+    document.getElementById('page-dashboard').classList.add('active');
+  } else {
+    document.getElementById('page-' + name).classList.add('active');
+  }
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'profile') prefillProfile();
 }
 
-const user = JSON.parse(userRaw || '{}');
-const city = (user.city || 'pune').toLowerCase();
-const health = user.health_condition || 'normal';
-const healthLabel = { normal: 'Normal', asthma: 'Asthma Mode', elderly: 'Elderly Mode' }[health] || 'Normal';
-
-// ── Populate user info ────────────────────────────────────────────────────────
-document.getElementById('userName').textContent = user.full_name || 'User';
-document.getElementById('userCity').textContent = user.city || '–';
-document.getElementById('userInitial').textContent = (user.full_name || 'U')[0].toUpperCase();
-document.getElementById('topbarLabel').textContent = `${(user.city || 'City').toUpperCase()} · ${healthLabel.toUpperCase()}`;
-
-// ── AQI color helper ──────────────────────────────────────────────────────────
-function aqiColor(v) {
-  if (v <= 50) return '#22a06b';
-  if (v <= 100) return '#f5a623';
-  if (v <= 150) return '#f07020';
-  if (v <= 200) return '#e05252';
-  return '#8b0000';
+// ── Profile pre-fill ──────────────────────────────────────────────────────────
+function prefillProfile() {
+  document.getElementById('pName').value = user.full_name || '';
+  document.getElementById('pCity').value = user.city || '';
+  document.querySelectorAll('#pAgeGroup .chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.val === user.age_group);
+  });
+  document.querySelectorAll('#pHealthCondition .health-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.val === (user.health_condition || 'normal'));
+  });
+  document.getElementById('profileMsg').className = 'pmsg';
+  document.getElementById('profileMsg').textContent = '';
 }
 
-// ── Fetch AQI ─────────────────────────────────────────────────────────────────
-async function loadAQI() {
+// ── Chip / card selection ─────────────────────────────────────────────────────
+document.querySelectorAll('#pAgeGroup .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#pAgeGroup .chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+  });
+});
+document.querySelectorAll('#pHealthCondition .health-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('#pHealthCondition .health-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+});
+
+// ── Save profile ──────────────────────────────────────────────────────────────
+async function saveProfile() {
+  const btn = document.getElementById('saveBtn');
+  const msg = document.getElementById('profileMsg');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  msg.className = 'pmsg'; msg.textContent = '';
+
+  const name  = document.getElementById('pName').value.trim();
+  const city  = document.getElementById('pCity').value.trim();
+  const age   = document.querySelector('#pAgeGroup .chip.selected')?.dataset.val || null;
+  const health= document.querySelector('#pHealthCondition .health-card.selected')?.dataset.val || null;
+
+  if (!name || !city) {
+    msg.textContent = 'Name and city are required.';
+    msg.className = 'pmsg error';
+    btn.disabled = false; btn.textContent = 'Save changes'; return;
+  }
+
   try {
-    const r = await fetch(`/api/aqi/${city}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    const res = await fetch('/api/auth/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ full_name: name, city, age_group: age, health_condition: health })
     });
-    const d = await r.json();
-    const aqi = d.aqi || 0;
-    const color = aqiColor(aqi);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Save failed');
 
-    document.getElementById('aqiCardLabel').textContent = `Right Now · ${(user.city || city).toUpperCase()}`;
-    document.getElementById('aqiValue').textContent = aqi;
-    document.getElementById('aqiValue').style.color = color;
-    document.getElementById('aqiStatus').textContent = d.category || '–';
-    document.getElementById('aqiStatus').style.color = color;
-    document.getElementById('aqiSub').textContent = `AQI · PM2.5 ${d.pm25?.toFixed(1) || '–'}`;
-    document.getElementById('pm10').textContent = d.pm10?.toFixed(1) || '–';
-    document.getElementById('no2').textContent = d.no2?.toFixed(1) || (Math.random()*60+20).toFixed(1);
-    document.getElementById('temp').textContent = d.temperature?.toFixed(1) || '–';
-    document.getElementById('humidity').textContent = d.humidity?.toFixed(0) || '–';
+    // Update local state
+    user = { ...user, full_name: name, city, age_group: age, health_condition: health };
+    localStorage.setItem('user', JSON.stringify(user));
+    refreshSidebar();
 
-    // Exposure (simulated based on AQI)
-    const exposureVal = (aqi * 0.8 + Math.random() * 30).toFixed(2);
-    const limitMap = { normal: 300, asthma: 200, elderly: 252 };
-    const limit = limitMap[health];
-    const pct = Math.min(100, (exposureVal / limit * 100)).toFixed(0);
-    document.getElementById('exposureVal').textContent = exposureVal;
-    document.getElementById('exposureLimit').textContent = `Limit (${health}): ${limit}`;
-    drawDonut(parseFloat(pct), color);
-  } catch(e) { console.error(e); }
+    msg.textContent = '✓ Changes saved successfully!';
+    msg.className = 'pmsg success';
+  } catch(e) {
+    msg.textContent = e.message || 'Failed to save.';
+    msg.className = 'pmsg error';
+  }
+  btn.disabled = false; btn.textContent = 'Save changes';
 }
 
-// ── Fetch trend (predictions history simulation) ──────────────────────────────
+// ── Dashboard data ────────────────────────────────────────────────────────────
+function aqiColor(v) {
+  if (v<=50) return '#22a06b'; if (v<=100) return '#f5a623';
+  if (v<=150) return '#f07020'; if (v<=200) return '#e05252'; return '#8b0000';
+}
+
+async function loadAQI() {
+  const city = (user.city || 'pune').toLowerCase();
+  const health = user.health_condition || 'normal';
+  const r = await fetch(`/api/aqi/${city}`);
+  const d = await r.json();
+  const aqi = d.aqi || 0; const color = aqiColor(aqi);
+  document.getElementById('aqiCardLabel').textContent = `Right Now · ${(user.city||city).toUpperCase()}`;
+  document.getElementById('aqiValue').textContent = aqi;
+  document.getElementById('aqiValue').style.color = color;
+  document.getElementById('aqiStatus').textContent = d.category || '–';
+  document.getElementById('aqiStatus').style.color = color;
+  document.getElementById('aqiSub').textContent = `AQI · PM2.5 ${d.pm25?.toFixed(1)||'–'}`;
+  document.getElementById('pm10').textContent = d.pm10?.toFixed(1)||'–';
+  document.getElementById('no2').textContent = (Math.random()*60+20).toFixed(1);
+  document.getElementById('temp').textContent = d.temperature?.toFixed(1)||'–';
+  document.getElementById('humidity').textContent = d.humidity?.toFixed(0)||'–';
+  const ev = (aqi*0.8+Math.random()*30).toFixed(2);
+  const limitMap = {normal:300,asthma:200,elderly:252};
+  const limit = limitMap[health];
+  document.getElementById('exposureVal').textContent = ev;
+  document.getElementById('exposureLimit').textContent = `Limit (${health}): ${limit}`;
+  drawDonut(Math.min(100,(ev/limit*100)), color);
+}
+
 async function loadTrend() {
-  try {
-    const r = await fetch(`/api/predictions/${city}`);
-    const d = await r.json();
-    const base = d.current_aqi || 120;
-
-    // Generate 14-day trend
-    const labels = [];
-    const values = [];
-    const now = new Date();
-    for (let i = 13; i >= 0; i--) {
-      const d2 = new Date(now);
-      d2.setDate(d2.getDate() - i);
-      labels.push(d2.toLocaleDateString('en', { month: 'short', day: 'numeric' }));
-      values.push(Math.max(30, base + (Math.random() - 0.5) * 40));
-    }
-
-    const delta = ((values[13] - values[6]) / values[6] * 100).toFixed(1);
-    const sign = delta > 0 ? '+' : '';
-    document.getElementById('trendDelta').textContent = `${sign}${delta}%`;
-    document.getElementById('trendDelta').style.color = delta > 0 ? '#e05252' : '#22a06b';
-
-    drawTrend(labels, values);
-  } catch(e) { console.error(e); }
+  const city = (user.city||'pune').toLowerCase();
+  const r = await fetch(`/api/predictions/${city}`);
+  const d = await r.json();
+  const base = d.current_aqi||120;
+  const labels=[],values=[],now=new Date();
+  for(let i=13;i>=0;i--){
+    const d2=new Date(now); d2.setDate(d2.getDate()-i);
+    labels.push(d2.toLocaleDateString('en',{month:'short',day:'numeric'}));
+    values.push(Math.max(30,base+(Math.random()-.5)*40));
+  }
+  const delta=((values[13]-values[6])/values[6]*100).toFixed(1);
+  document.getElementById('trendDelta').textContent=`${delta>0?'+':''}${delta}%`;
+  document.getElementById('trendDelta').style.color=delta>0?'#e05252':'#22a06b';
+  drawTrend(labels,values);
 }
 
-// ── Carbon (simulated) ────────────────────────────────────────────────────────
-function loadCarbon() {
-  const today = (Math.random() * 3 + 2).toFixed(2);
-  const week = (parseFloat(today) * 5 + Math.random() * 5).toFixed(2);
-  const total = (parseFloat(week) * 4 + Math.random() * 10).toFixed(2);
-  const trees = (parseFloat(total) / 21.77).toFixed(2);
-  document.getElementById('carbonTotal').textContent = total;
-  document.getElementById('carbonToday').textContent = today + ' kg';
-  document.getElementById('carbonWeek').textContent = week + ' kg';
-  document.getElementById('carbonTrees').textContent = trees + ' trees/yr';
+function loadCarbon(){
+  const t=(Math.random()*3+2).toFixed(2);
+  const w=(parseFloat(t)*5+Math.random()*5).toFixed(2);
+  const total=(parseFloat(w)*4+Math.random()*10).toFixed(2);
+  document.getElementById('carbonTotal').textContent=total;
+  document.getElementById('carbonToday').textContent=t+' kg';
+  document.getElementById('carbonWeek').textContent=w+' kg';
+  document.getElementById('carbonTrees').textContent=(parseFloat(total)/21.77).toFixed(2)+' trees/yr';
 }
 
-// ── Draw donut ────────────────────────────────────────────────────────────────
-function drawDonut(pct, color) {
-  const ctx = document.getElementById('donutChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [pct, 100 - pct],
-        backgroundColor: [color, '#f0eeea'],
-        borderWidth: 0,
-      }]
-    },
-    options: {
-      cutout: '72%',
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      animation: { duration: 800 },
-    }
-  });
+function drawDonut(pct,color){
+  const ctx=document.getElementById('donutChart').getContext('2d');
+  new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,'#f0eeea'],borderWidth:0}]},options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:800}}});
 }
 
-// ── Draw trend chart ──────────────────────────────────────────────────────────
-function drawTrend(labels, values) {
-  const ctx = document.getElementById('trendChart').getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-  gradient.addColorStop(0, 'rgba(240,112,32,0.25)');
-  gradient.addColorStop(1, 'rgba(240,112,32,0.0)');
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        borderColor: '#f07020',
-        backgroundColor: gradient,
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 0,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#aaa', maxTicksLimit: 7 } },
-        y: { grid: { color: '#f0eeea' }, ticks: { font: { size: 11 }, color: '#aaa' }, beginAtZero: true }
-      }
-    }
-  });
+function drawTrend(labels,values){
+  const ctx=document.getElementById('trendChart').getContext('2d');
+  const g=ctx.createLinearGradient(0,0,0,200);
+  g.addColorStop(0,'rgba(240,112,32,0.25)'); g.addColorStop(1,'rgba(240,112,32,0)');
+  new Chart(ctx,{type:'line',data:{labels,datasets:[{data:values,borderColor:'#f07020',backgroundColor:g,borderWidth:2,fill:true,tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11},color:'#aaa',maxTicksLimit:7}},y:{grid:{color:'#f0eeea'},ticks:{font:{size:11},color:'#aaa'},beginAtZero:true}}}});
 }
 
-// ── Logout ────────────────────────────────────────────────────────────────────
-function logout() {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('user');
-  window.location.href = '/dashboard';
+function logout(){
+  localStorage.removeItem('access_token'); localStorage.removeItem('user');
+  window.location.href='/';
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-Promise.all([loadAQI(), loadTrend()])
-  .then(() => {
-    loadCarbon();
-    document.getElementById('loading').style.display = 'none';
-  })
-  .catch(() => {
-    document.getElementById('loading').style.display = 'none';
-  });
+Promise.all([loadAQI(),loadTrend()])
+  .then(()=>{ loadCarbon(); document.getElementById('loading').style.display='none'; })
+  .catch(()=>{ document.getElementById('loading').style.display='none'; });
 </script>
 </body>
 </html>
