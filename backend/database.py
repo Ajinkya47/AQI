@@ -6,6 +6,8 @@ from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+from sqlalchemy import Boolean
+
 
 from backend.config import get_settings
 
@@ -63,6 +65,22 @@ class AlertRecord(Base):
     message = Column(String)
     aqi_value = Column(Integer)
     timestamp = Column(DateTime, default=datetime.utcnow)
+
+class User(Base):
+    """Store registered users."""
+ 
+    __tablename__ = "users"
+ 
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    city = Column(String, nullable=True)
+    age_group = Column(String, nullable=True)        # <18 | 18-30 | 30-45 | 45-60 | 60+
+    health_condition = Column(String, nullable=True) # normal | asthma | elderly
+    created_at = Column(DateTime, default=datetime.utcnow)
+    is_active = Column(Boolean, default=True)
+
 
 
 def create_tables():

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirAware – Log In</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: #f5f4f0;
+      color: #1a1a1a;
+    }
+
+    .left {
+      flex: 1;
+      background: url('https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?auto=format&fit=crop&w=900&q=80')
+                  center/cover no-repeat;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 40px;
+    }
+    .left-card {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(6px);
+      border-radius: 16px;
+      padding: 28px 32px;
+      max-width: 420px;
+    }
+    .left-card .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .left-card p { font-size: 14px; color: #444; line-height: 1.6; }
+
+    .right {
+      width: 520px;
+      min-width: 420px;
+      background: #f5f4f0;
+      padding: 48px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+    .brand-icon {
+      width: 40px; height: 40px;
+      background: #1a7ec8;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px;
+    }
+    .brand-name { font-size: 18px; font-weight: 700; }
+
+    .page-title { font-size: 34px; font-weight: 800; margin-bottom: 6px; }
+    .page-subtitle { font-size: 14px; color: #888; margin-bottom: 32px; }
+
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 7px; }
+    .field input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid #e0ddd8;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field input:focus { border-color: #1a7ec8; }
+
+    .msg {
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .msg.error { background: #fdecea; color: #c0392b; }
+    .msg.success { background: #eafaf1; color: #1e8449; }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 40px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      background: #1a7ec8;
+      color: #fff;
+      transition: opacity .18s, transform .12s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .register-link { text-align: center; margin-top: 20px; font-size: 13px; color: #888; }
+    .register-link a { color: #1a7ec8; text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .left { display: none; }
+      .right { width: 100%; min-width: unset; padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="left">
+  <div class="left-card">
+    <div class="label">Welcome back</div>
+    <p>Log in to see real-time AQI, route recommendations, and personalized air-quality alerts for your city.</p>
+  </div>
+</div>
+
+<div class="right">
+  <div class="brand">
+    <div class="brand-icon">💨</div>
+    <span class="brand-name">AirAware</span>
+  </div>
+
+  <h1 class="page-title">Welcome back.</h1>
+  <p class="page-subtitle">Log in to your account.</p>
+
+  <div id="msg" class="msg" style="display:none"></div>
+
+  <div class="field">
+    <label>Email</label>
+    <input id="email" type="email" placeholder="you@example.com" />
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input id="password" type="password" placeholder="••••••••••" />
+  </div>
+
+  <button class="btn" id="loginBtn" onclick="doLogin()">Log in</button>
+  <div class="register-link">Don't have an account? <a href="/register">Sign up</a></div>
+</div>
+
+<script>
+  // Allow Enter key to submit
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  async function doLogin() {
+    const btn = document.getElementById('loginBtn');
+    const msgEl = document.getElementById('msg');
+    msgEl.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Logging in…';
+
+    const payload = {
+      email:    document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+    };
+
+    if (!payload.email || !payload.password) {
+      msgEl.textContent = 'Please fill in both fields.';
+      msgEl.className = 'msg error'; msgEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Log in';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.detail || 'Login failed.';
+        msgEl.className = 'msg error'; msgEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Log in';
+        return;
+      }
+
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      window.location.href = '/dashboard';
+    } catch {
+      msgEl.textContent = 'Network error. Is the server running?';
+      msgEl.className = 'msg error'; msgEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Log in';
+    }
+  }
+</script>
+</body>
+</html>

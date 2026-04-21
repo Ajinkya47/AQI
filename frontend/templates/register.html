@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirAware – Create Account</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: #f5f4f0;
+      color: #1a1a1a;
+    }
+
+    /* ── Left panel ── */
+    .left {
+      flex: 1;
+      background: url('https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?auto=format&fit=crop&w=900&q=80')
+                  center/cover no-repeat;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 40px;
+    }
+    .left-card {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(6px);
+      border-radius: 16px;
+      padding: 28px 32px;
+      max-width: 420px;
+    }
+    .left-card .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .left-card p {
+      font-size: 14px;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    /* ── Right panel ── */
+    .right {
+      width: 520px;
+      min-width: 420px;
+      background: #f5f4f0;
+      padding: 48px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    /* ── Brand ── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+    .brand-icon {
+      width: 40px; height: 40px;
+      background: #1a7ec8;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px;
+    }
+    .brand-name { font-size: 18px; font-weight: 700; }
+
+    /* ── Step indicator ── */
+    .step-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .page-title {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    /* ── Form ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 7px;
+    }
+    .field input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid #e0ddd8;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field input:focus { border-color: #1a7ec8; }
+    .field input.error { border-color: #e05252; }
+
+    /* ── Age group chips ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 12px;
+    }
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .chip {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1.5px solid #e0ddd8;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+    }
+    .chip:hover { border-color: #1a7ec8; }
+    .chip.selected {
+      border-color: #1a7ec8;
+      background: #e8f3fc;
+      color: #1a7ec8;
+      font-weight: 700;
+    }
+
+    /* ── Health condition cards ── */
+    .health-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .health-card {
+      flex: 1;
+      padding: 18px 14px;
+      border-radius: 14px;
+      border: 1.5px solid #e0ddd8;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: all .18s;
+    }
+    .health-card:hover { border-color: #1a7ec8; }
+    .health-card.selected {
+      border-color: #1a7ec8;
+      background: #e8f3fc;
+    }
+    .health-card .emoji { font-size: 24px; margin-bottom: 8px; display: block; }
+    .health-card .hc-name { font-weight: 700; font-size: 14px; color: #1a1a1a; }
+    .health-card .hc-desc { font-size: 12px; color: #999; margin-top: 3px; }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .btn {
+      flex: 1;
+      padding: 15px;
+      border-radius: 40px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity .18s, transform .12s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #d0ccc6;
+      color: #555;
+    }
+    .btn-primary {
+      background: #1a7ec8;
+      color: #fff;
+    }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Step visibility */
+    .step { display: none; }
+    .step.active { display: block; }
+
+    /* ── Error/success messages ── */
+    .msg {
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .msg.error { background: #fdecea; color: #c0392b; }
+    .msg.success { background: #eafaf1; color: #1e8449; }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #888;
+    }
+    .login-link a { color: #1a7ec8; text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .left { display: none; }
+      .right { width: 100%; min-width: unset; padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Left panel -->
+<div class="left">
+  <div class="left-card">
+    <div class="label">Why your profile matters</div>
+    <p>Your age and health condition tune the safe-exposure thresholds and route recommendations.
+       Asthma users get stricter AQI alerts — so you breathe easy.</p>
+  </div>
+</div>
+
+<!-- Right panel -->
+<div class="right">
+
+  <div class="brand">
+    <div class="brand-icon">💨</div>
+    <span class="brand-name">AirAware</span>
+  </div>
+
+  <!-- ── STEP 1 ── -->
+  <div id="step1" class="step active">
+    <div class="step-label">Step 1 of 2</div>
+    <h1 class="page-title">Create your account.</h1>
+    <p class="page-subtitle">Two minutes. No card required.</p>
+
+    <div id="msg1" class="msg" style="display:none"></div>
+
+    <div class="field">
+      <label>Full name</label>
+      <input id="fullName" type="text" placeholder="Ajinkya Gorakshanth Kokate" />
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="you@example.com" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="••••••••••" />
+    </div>
+    <div class="field">
+      <label>City</label>
+      <input id="city" type="text" placeholder="Delhi" />
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep2()">Continue</button>
+    </div>
+    <div class="login-link">Already have an account? <a href="/login">Log in</a></div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div id="step2" class="step">
+    <div class="step-label">Step 2 of 2</div>
+    <h1 class="page-title">Tell us about you.</h1>
+    <p class="page-subtitle">Helps personalize alerts and routes.</p>
+
+    <div id="msg2" class="msg" style="display:none"></div>
+
+    <div class="section-label">Age Group</div>
+    <div class="chip-group" id="ageGroup">
+      <div class="chip" data-val="<18">&lt;18</div>
+      <div class="chip selected" data-val="18-30">18–30</div>
+      <div class="chip" data-val="30-45">30–45</div>
+      <div class="chip" data-val="45-60">45–60</div>
+      <div class="chip" data-val="60+">60+</div>
+    </div>
+
+    <div class="section-label">Health Condition</div>
+    <div class="health-group" id="healthCondition">
+      <div class="health-card selected" data-val="normal">
+        <span class="emoji">🫁</span>
+        <div class="hc-name">Normal</div>
+        <div class="hc-desc">No respiratory conditions</div>
+      </div>
+      <div class="health-card" data-val="asthma">
+        <span class="emoji">🌫️</span>
+        <div class="hc-name">Asthma</div>
+        <div class="hc-desc">Sensitive to PM2.5 / NO₂</div>
+      </div>
+      <div class="health-card" data-val="elderly">
+        <span class="emoji">🧓</span>
+        <div class="hc-name">Elderly</div>
+        <div class="hc-desc">Lower activity tolerance</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goStep1()">Back</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitRegister()">Create account</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── chip/card selection ─────────────────────────────────────────────────────
+  document.querySelectorAll('#ageGroup .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#ageGroup .chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    });
+  });
+  document.querySelectorAll('#healthCondition .health-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('#healthCondition .health-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // ── step navigation ─────────────────────────────────────────────────────────
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+    el.style.display = 'block';
+  }
+  function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
+
+  function goStep2() {
+    hideMsg('msg1');
+    const name = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pw = document.getElementById('password').value;
+    if (!name || !email || !pw) {
+      return showMsg('msg1', 'Please fill in all fields.', 'error');
+    }
+    if (pw.length < 6) {
+      return showMsg('msg1', 'Password must be at least 6 characters.', 'error');
+    }
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+  }
+
+  function goStep1() {
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+  }
+
+  // ── submit ──────────────────────────────────────────────────────────────────
+  async function submitRegister() {
+    hideMsg('msg2');
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating…';
+
+    const ageGroup = document.querySelector('#ageGroup .chip.selected')?.dataset.val || null;
+    const health   = document.querySelector('#healthCondition .health-card.selected')?.dataset.val || null;
+
+    const payload = {
+      full_name:        document.getElementById('fullName').value.trim(),
+      email:            document.getElementById('email').value.trim(),
+      password:         document.getElementById('password').value,
+      city:             document.getElementById('city').value.trim() || null,
+      age_group:        ageGroup,
+      health_condition: health,
+    };
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showMsg('msg2', data.detail || 'Registration failed.', 'error');
+        btn.disabled = false; btn.textContent = 'Create account';
+        return;
+      }
+
+      // Store token and redirect to dashboard
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      window.location.href = '/dashboard';
+    } catch (err) {
+      showMsg('msg2', 'Network error. Is the server running?', 'error');
+      btn.disabled = false; btn.textContent = 'Create account';
+    }
+  }
+</script>
+</body>
+</html>
